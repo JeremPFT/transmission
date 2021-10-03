@@ -656,7 +656,7 @@ N is the desired threshold.  A negative value of N means to disable the limit."
   (let ((arguments `(:ids ,ids ,(pcase limit
                                   (:uploadLimit :uploadLimited)
                                   (:downloadLimit :downloadLimited))
-                     ,@(if (< n 0) '(:json-false) `(t ,limit ,n)))))
+                          ,@(if (< n 0) '(:json-false) `(t ,limit ,n)))))
     (transmission-request-async nil "torrent-set" arguments)))
 
 (defun transmission-torrent-honors-speed-limits-p ()
@@ -995,34 +995,34 @@ point or in region, otherwise a `user-error' is signalled."
           (if (setq ,region (use-region-p))
               (setq ids
                     (cl-loop for x in
-                     (transmission-text-property-all
-                      (region-beginning) (region-end) 'tabulated-list-id)
-                     collect (cdr (assq 'hashString x))))
+                             (transmission-text-property-all
+                              (region-beginning) (region-end) 'tabulated-list-id)
+                             collect (cdr (assq 'hashString x))))
             (let ((value (tabulated-list-get-id (point))))
               (when value (setq ids (list (cdr (assq 'hashString value))))))))
         (if (null ids) (user-error "No torrent selected")
           ,@(cl-labels
                 ((expand (form x)
-                   (cond
-                    ((atom form) form)
-                    ((and (listp form)
-                          (memq (car form)
-                                '(read-number y-or-n-p yes-or-no-p
-                                  completing-read transmission-read-strings)))
-                     (pcase form
-                       (`(read-number ,prompt . ,rest)
-                        `(read-number (concat ,prompt ,x) ,@rest))
-                       (`(y-or-n-p ,prompt)
-                        `(y-or-n-p (concat ,prompt ,x)))
-                       (`(yes-or-no-p ,prompt)
-                        `(yes-or-no-p (concat ,prompt ,x)))
-                       (`(completing-read ,prompt . ,rest)
-                        `(completing-read (concat ,prompt ,x) ,@rest))
-                       (`(transmission-read-strings ,prompt . ,rest)
-                        `(transmission-read-strings (concat ,prompt ,x) ,@rest))))
-                    ((or (listp form) (null form))
-                     (mapcar (lambda (subexp) (expand subexp x)) form))
-                    (t (error "Bad syntax: %S" form)))))
+                         (cond
+                          ((atom form) form)
+                          ((and (listp form)
+                                (memq (car form)
+                                      '(read-number y-or-n-p yes-or-no-p
+                                                    completing-read transmission-read-strings)))
+                           (pcase form
+                             (`(read-number ,prompt . ,rest)
+                              `(read-number (concat ,prompt ,x) ,@rest))
+                             (`(y-or-n-p ,prompt)
+                              `(y-or-n-p (concat ,prompt ,x)))
+                             (`(yes-or-no-p ,prompt)
+                              `(yes-or-no-p (concat ,prompt ,x)))
+                             (`(completing-read ,prompt . ,rest)
+                              `(completing-read (concat ,prompt ,x) ,@rest))
+                             (`(transmission-read-strings ,prompt . ,rest)
+                              `(transmission-read-strings (concat ,prompt ,x) ,@rest))))
+                          ((or (listp form) (null form))
+                           (mapcar (lambda (subexp) (expand subexp x)) form))
+                          (t (error "Bad syntax: %S" form)))))
               (expand spec
                       `(cond
                         (,marked (format "[%d marked] " (length ,marked)))
@@ -1033,9 +1033,9 @@ point or in region, otherwise a `user-error' is signalled."
   (let (res)
     (cl-flet
         ((collect (fun &rest args)
-           (let ((val (apply fun args)))
-             (when val (cl-pushnew val res :test #'equal))
-             nil)))
+                  (let ((val (apply fun args)))
+                    (when val (cl-pushnew val res :test #'equal))
+                    nil)))
       (apply #'run-hook-wrapped hook #'collect args)
       (nreverse res))))
 
@@ -1253,7 +1253,7 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
      (list ids n (when (= n 1) (read-number "Set torrent ratio limit: ")))))
   (when ids
     (let ((arguments `(:ids ,ids :seedRatioMode ,mode
-                       ,@(when limit `(:seedRatioLimit ,limit)))))
+                            ,@(when limit `(:seedRatioLimit ,limit)))))
       (transmission-request-async nil "torrent-set" arguments))))
 
 (defun transmission-toggle-limits (ids)
@@ -1737,12 +1737,12 @@ transmission rates."
   (let* ((bytes (base64-decode-string pieces))
          (bits (mapconcat #'transmission-byte->string bytes "")))
     (cl-flet ((string-partition (s n)
-                (let (res middle last)
-                  (while (not (zerop (setq last (length s))))
-                    (setq middle (min n last))
-                    (push (substring s 0 middle) res)
-                    (setq s (substring s middle last)))
-                  (nreverse res))))
+                                (let (res middle last)
+                                  (while (not (zerop (setq last (length s))))
+                                    (setq middle (min n last))
+                                    (push (substring s 0 middle) res)
+                                    (setq s (substring s middle last)))
+                                  (nreverse res))))
       (string-join (string-partition (substring bits 0 count) 72) "\n"))))
 
 (defun transmission-format-pieces-brief (pieces count)
@@ -1794,8 +1794,8 @@ PEERS is an array of peer-specific data.
 ORIGINS is an alist giving counts of peers from different swarms.
 CONNECTED, SENDING, RECEIVING are numbers."
   (cl-macrolet ((accumulate (array key)
-                  `(cl-loop for alist across ,array
-                            count (eq t (cdr (assq ,key alist))))))
+                            `(cl-loop for alist across ,array
+                                      count (eq t (cdr (assq ,key alist))))))
     (if (zerop connected) "Peers: none connected\n"
       (concat
        (format "Peers: %d connected, uploading to %d, downloading from %d"
@@ -2054,11 +2054,11 @@ is constructed from TEST, BODY and the `tabulated-list-id' tagged as `<>'."
         (b (make-symbol "b")))
     (cl-labels
         ((cut (form x)
-           (cond
-            ((eq form '<>) (list 'car x))
-            ((atom form) form)
-            ((or (listp form) (null form))
-             (mapcar (lambda (subexp) (cut subexp x)) form)))))
+              (cond
+               ((eq form '<>) (list 'car x))
+               ((atom form) form)
+               ((or (listp form) (null form))
+                (mapcar (lambda (subexp) (cut subexp x)) form)))))
       `(defun ,(intern (concat "transmission-" (symbol-name name))) (,a ,b)
          (,test ,(cut (macroexp-progn body) a)
                 ,(cut (macroexp-progn body) b))))))
