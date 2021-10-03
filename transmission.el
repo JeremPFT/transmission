@@ -271,6 +271,7 @@ caching built in or is otherwise slow."
 (defconst transmission-draw-torrents-keys
   ["hashString" "name" "status" "eta" "error" "labels"
    "rateDownload" "rateUpload"
+   "downloadDir"
    "percentDone" "sizeWhenDone" "metadataPercentComplete"
    "uploadRatio"])
 
@@ -1893,6 +1894,8 @@ Each form in BODY is a column descriptor."
     (if (not (zerop .error)) (propertize "error" 'font-lock-face 'error)
       (transmission-format-status .status .rateUpload .rateDownload))
     (concat
+     (when (not (eq nil .downloadDir)) (abbreviate-file-name .downloadDir))
+     "/"
      (propertize .name 'transmission-name t)
      (mapconcat (lambda (l)
                   (concat " " (propertize l 'font-lock-face 'font-lock-constant-face)))
