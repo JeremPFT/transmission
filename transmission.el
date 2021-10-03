@@ -789,7 +789,7 @@ NOW is a time, defaulting to `current-time'."
       (get-text-property (point) :nt-link)
       (let ((fn (run-hook-with-args-until-success 'file-name-at-point-functions)))
         (unless (transmission-directory-name-p fn) fn))
-      (url-get-url-at-point)
+      (thing-at-point-url-at-point)
       (transmission-btih-p (thing-at-point 'word))))
 
 (defun transmission-ffap-string (string)
