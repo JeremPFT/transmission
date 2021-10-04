@@ -1898,7 +1898,7 @@ Each form in BODY is a column descriptor."
      "/"
      (propertize .name 'transmission-name t)
      (mapconcat (lambda (l)
-                  (concat " " (propertize l 'font-lock-face 'font-lock-constant-face)))
+                  (concat " " (propertize (concat ":" l ":") 'font-lock-face 'font-lock-constant-face)))
                 .labels "")))
   (tabulated-list-print))
 
