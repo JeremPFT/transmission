@@ -2204,6 +2204,7 @@ for explanation of the peer flags."
     (define-key map "!" 'transmission-files-command)
     (define-key map "&" 'transmission-files-command)
     (define-key map "X" 'transmission-files-command)
+    (define-key map (kbd "SPC") 'transmission-files-command)
     (define-key map "W" 'transmission-browse-url-of-file)
     (define-key map "C" 'transmission-copy-file)
     (define-key map "d" 'transmission-dired-file)
