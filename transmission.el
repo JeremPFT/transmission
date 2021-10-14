@@ -1894,8 +1894,7 @@ Each form in BODY is a column descriptor."
     (if (not (zerop .error)) (propertize "error" 'font-lock-face 'error)
       (transmission-format-status .status .rateUpload .rateDownload))
     (concat
-     (when (not (eq nil .downloadDir)) (abbreviate-file-name .downloadDir))
-     "/"
+     (unless (eq nil .downloadDir) (abbreviate-file-name (file-name-as-directory .downloadDir)))
      (propertize .name 'transmission-name t)
      (mapconcat (lambda (l)
                   (concat " " (propertize (concat ":" l ":") 'font-lock-face 'font-lock-constant-face)))
