@@ -1524,7 +1524,9 @@ See `transmission-read-time' for details on time input."
      (if fap (list (if (string-empty-p input) (or (car def) "") input) fap)
        (user-error "File does not exist"))))
   (let ((args (nconc (split-string-and-unquote command)
-                     (list (expand-file-name file)))))
+                     (list (if (eq system-type 'windows-nt)
+                               (replace-regexp-in-string "/" "\\\\" (expand-file-name file))
+                             (expand-file-name file))))))
     (apply #'start-process (car args) nil args)))
 
 (defun transmission-copy-file (file newname &optional ok-if-already-exists)
