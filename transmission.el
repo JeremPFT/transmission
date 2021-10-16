@@ -1523,9 +1523,10 @@ See `transmission-read-time' for details on time input."
           (input (read-shell-command prompt nil nil def t)))
      (if fap (list (if (string-empty-p input) (or (car def) "") input) fap)
        (user-error "File does not exist"))))
+
   (let ((args (nconc (split-string-and-unquote command)
                      (list (if (eq system-type 'windows-nt)
-                               (replace-regexp-in-string "/" "\\\\" (expand-file-name file))
+                               (subst-char-in-string ?/ ?\\ (expand-file-name file))
                              (expand-file-name file))))))
     (apply #'start-process (car args) nil args)))
 
