@@ -1183,7 +1183,8 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
          (setq transmission-marked-ids nil deactivate-mark t)
          ids)))
   (when ids
-    (transmission-request-async nil "torrent-remove" `(:ids ,ids :delete-local-data t))))
+    (transmission-request-async nil "torrent-remove" `(:ids ,ids :delete-local-data t)))
+  (revert-buffer))
 
 (defun transmission-set-bandwidth-priority (ids priority)
   "Set bandwidth priority of torrent(s) at point, in region, or marked."
