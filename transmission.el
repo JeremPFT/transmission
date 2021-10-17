@@ -1282,7 +1282,8 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
               (method (and status
                            (if (zerop status) "torrent-start" "torrent-stop"))))
          (when method (transmission-request-async nil method (list :ids ids)))))
-     "torrent-get" (list :ids ids :fields ["status"]))))
+     "torrent-get" (list :ids ids :fields ["status"])))
+  (revert-buffer))
 
 (defun transmission-label (ids labels)
   "Set labels for selected torrent(s)."
