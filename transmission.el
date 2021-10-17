@@ -1292,7 +1292,8 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
           (torrents (transmission-torrents response)))
      (list ids (transmission-read-strings "Labels: " (transmission-unique-labels torrents)))))
   (transmission-request-async
-   nil "torrent-set" (list :ids ids :labels (vconcat labels))))
+   nil "torrent-set" (list :ids ids :labels (vconcat labels)))
+  (revert-buffer))
 
 (defun transmission-trackers-add (ids urls)
   "Add announce URLs to selected torrent or torrents."
