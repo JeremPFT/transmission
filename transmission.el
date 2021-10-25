@@ -269,7 +269,7 @@ caching built in or is otherwise slow."
   "Array of possible Transmission torrent statuses.")
 
 (defconst transmission-draw-torrents-keys
-  ["hashString" "name" "status" "eta" "error" "labels"
+  ["id" "hashString" "name" "status" "eta" "error" "labels"
    "rateDownload" "rateUpload"
    "downloadDir"
    "percentDone" "sizeWhenDone" "metadataPercentComplete"
@@ -2073,6 +2073,7 @@ is constructed from TEST, BODY and the `tabulated-list-id' tagged as `<>'."
          (,test ,(cut (macroexp-progn body) a)
                 ,(cut (macroexp-progn body) b))))))
 
+(define-transmission-predicate id>? > (cdr (assq 'id <>)))
 (define-transmission-predicate download>? > (cdr (assq 'rateToClient <>)))
 (define-transmission-predicate upload>? > (cdr (assq 'rateToPeer <>)))
 (define-transmission-predicate size>? > (cdr (assq 'length <>)))
@@ -2374,7 +2375,8 @@ Transmission."
   :group 'transmission
   (setq-local line-move-visual nil)
   (setq tabulated-list-format
-        [("ETA" 4 transmission-eta>=? :right-align t)
+        [("ID" 4 transmission-id>? :right-align t)
+         ("ETA" 4 transmission-eta>=? :right-align t)
          ("Size" 9 transmission-size-when-done>?
           :right-align t :transmission-size t)
          ("Have" 4 transmission-percent-done>? :right-align t)
@@ -2382,7 +2384,7 @@ Transmission."
          ("Up" 3 nil :right-align t)
          ("Ratio" 5 transmission-ratio>? :right-align t)
          ("Status" 11 t)
-         ("Name" 0 t)])
+         ("Name (8)" 0 t)])
   (setq tabulated-list-padding 1)
   (transmission-tabulated-list-format)
   (setq tabulated-list-printer #'transmission-print-torrent)
