@@ -2221,7 +2221,7 @@ for explanation of the peer flags."
 
 (defvar transmission-files-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") 'transmission-find-file)
+    ;; (define-key map (kbd "RET") 'transmission-find-file)
     (define-key map "o" 'transmission-find-file-other-window)
     (define-key map (kbd "C-o") 'transmission-display-file)
     (define-key map "^" 'quit-window)
@@ -2229,6 +2229,7 @@ for explanation of the peer flags."
     (define-key map "&" 'transmission-files-command)
     (define-key map "X" 'transmission-files-command)
     (define-key map (kbd "SPC") 'transmission-files-command)
+    (define-key map (kbd "RET") 'transmission-files-command)
     (define-key map "W" 'transmission-browse-url-of-file)
     (define-key map "C" 'transmission-copy-file)
     (define-key map "d" 'transmission-dired-file)
