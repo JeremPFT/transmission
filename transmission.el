@@ -1903,13 +1903,88 @@ Each form in BODY is a column descriptor."
              ,seq)
        (setq tabulated-list-entries (nreverse ,res)))))
 
+(defun torrent-labels (torrent)
+  (append (cdr (assoc 'labels torrent)) nil))
+
+(defun torrent-eta (torrent)
+  (cdr (assoc 'eta torrent)))
+
+(defun torrent-name (torrent)
+  (cdr (assoc 'name torrent)))
+
+(defun torrent-percentDone (torrent)
+  (cdr (assoc 'percentDone torrent)))
+
+(defun torrent-Sizewhendone (torrent)
+  (cdr (assoc 'sizeWhenDone torrent)))
+
+(defun torrent-is-done (torrent)
+  (and (<= (torrent-eta torrent) 0) (= (torrent-percentDone torrent) 1)))
+
+;; (and (<= torrent-eta 0) (not (= torrent-percentDone 1))) ;; ∞
+(defun torrent-is-not-done (torrent)
+  (> (torrent-eta torrent) 0))
+
+(defun torrent-has-no-label (torrent)
+  (= (length (torrent-labels torrent)) 0))
+
+(defun torrent-has-infinite-eta (torrent)
+  (and (<= (torrent-eta torrent) 0) (not (= (torrent-percentDone torrent) 1))))
+
+;; torrent age: rpc, field addedDate
+
+(defun transmission-draw-torrents-filtering (torrent-array)
+  (let ((filtered-list nil))
+    (cl-loop for torrent across torrent-array do
+             (when
+                 (and
+                  t
+
+                  (torrent-is-done torrent)
+
+                  (torrent-has-no-label torrent)
+
+                  ;; (string-match ".*larimar.*" (torrent-name torrent))
+
+                  ;; (> (torrent-sizeWhenDone torrent) (expt 10 9)) ;; size > 1G
+
+
+                  ;; (torrent-has-infinite-eta torrent)
+
+                  ;; (or
+                  ;;  (torrent-is-not-done torrent)
+                  ;;  (torrent-has-infinite-eta torrent))
+
+                  ;; (member "convert_todo" (torrent-labels torrent))
+                  (not (member "film" (torrent-labels torrent)))
+                  (not (member "linux" (torrent-labels torrent)))
+                  )
+
+               (setq filtered-list (nconc filtered-list (list torrent)))
+               ;; (setq filtered-list
+               ;;       (append filtered-list (list torrent)))
+               ))
+    filtered-list
+    ))
+
 (defun transmission-draw-torrents (_id)
   (let* ((arguments `(:fields ,transmission-draw-torrents-keys))
          (response (transmission-request "torrent-get" arguments)))
-    (setq transmission-torrent-vector (transmission-torrents response)))
+    (setq transmission-torrent-vector
+          (vconcat (transmission-draw-torrents-filtering (transmission-torrents response))
+                   (list)))
+    )
   (transmission-do-entries transmission-torrent-vector
+    (number-to-string .id)
     (transmission-eta .eta .percentDone)
-    (transmission-size .sizeWhenDone)
+
+    (transmission-size
+     ;; print real size when video file is converted
+     (if (or (member "convert_done" (append .labels nil)) (member "extract_done" (append .labels nil)))
+         (string-to-number (car (split-string (shell-command-to-string (concat "du -b \"" (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) "\"")))))
+       ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/File-Attributes.html
+       .sizeWhenDone))
+
     (format "%d%%" (* 100 (if (= 1 .metadataPercentComplete)
                               .percentDone .metadataPercentComplete)))
     (format "%d" (transmission-rate .rateDownload))
@@ -1918,12 +1993,16 @@ Each form in BODY is a column descriptor."
     (if (not (zerop .error)) (propertize "error" 'font-lock-face 'error)
       (transmission-format-status .status .rateUpload .rateDownload))
     (concat
-     (unless (eq nil .downloadDir) (abbreviate-file-name (file-name-as-directory .downloadDir)))
-     (propertize .name 'transmission-name t)
+     (if (eq nil .downloadDir) (propertize .name 'transmission-name t)
+       (propertize (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) 'transmission-name t))
+
      (mapconcat (lambda (l)
                   (concat " " (propertize (concat ":" l ":") 'font-lock-face 'font-lock-constant-face)))
                 .labels "")))
   (tabulated-list-print))
+
+(defun torrent-file-name (torrent-file)
+  (cdr (assoc 'name torrent-file)))
 
 (defun transmission-draw-files (id)
   (let* ((arguments `(:ids ,id :fields ,transmission-draw-files-keys))
@@ -1931,6 +2010,23 @@ Each form in BODY is a column descriptor."
     (setq transmission-torrent-vector (transmission-torrents response)))
   (let* ((files (transmission-files-index (elt transmission-torrent-vector 0)))
          (prefix (transmission-files-prefix files)))
+
+    (let ((files-filtered-list nil))
+      (cl-loop for file across files do
+               (when
+                   (and
+                    (not (zerop (cdr (assoc 'wanted file))))
+                    ;; (string-match
+                    ;;  "\\(\\(mp4\\)\\|\\(avi\\)\\|\\(wmv\\)\\|\\(mov\\)\\)$"
+                    ;;  (torrent-file-name file))
+                    )
+
+                 (setq files-filtered-list
+                       (append files-filtered-list (list file)))
+
+                 ))
+      (setq files (vconcat files-filtered-list nil)))
+
     (transmission-do-entries files
       (format "%d%%" (transmission-percent .bytesCompleted .length))
       (symbol-name (car (rassq .priority transmission-priority-alist)))
