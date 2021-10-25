@@ -1499,12 +1499,14 @@ See `transmission-read-time' for details on time input."
 (defun transmission-files-unwant ()
   "Mark file(s)--at point, in region, or marked--as unwanted."
   (interactive)
-  (transmission-files-do :files-unwanted))
+  (transmission-files-do :files-unwanted)
+  (revert-buffer))
 
 (defun transmission-files-want ()
   "Mark file(s)--at point, in region, or marked--as wanted."
   (interactive)
-  (transmission-files-do :files-wanted))
+  (transmission-files-do :files-wanted)
+  (revert-buffer))
 
 (defun transmission-files-priority (priority)
   "Set bandwidth PRIORITY on file(s) at point, in region, or marked."
