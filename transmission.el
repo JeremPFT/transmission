@@ -581,9 +581,25 @@ METHOD, ARGUMENTS, and TAG are the same as in `transmission-request'."
   "Return a list of the values of KEY in each element of SEQUENCE."
   (mapcar (lambda (x) (cdr (assq key x))) sequence))
 
+(defun file-size-human-readable-jpi (bytes units)
+  "Return string showing size BYTES in human-readable form (replace `x G' with `x * 10^3 M')."
+
+  (let ((result (file-size-human-readable bytes units)))
+    (cond
+     ((string-match "\\([1-9]+\\)\\.\\([1-9]\\)G$" result)
+      (concat (match-string 1 result) (match-string 2 result) "00M")
+      )
+     ((string-match "\\([1-9]+\\)G$" result)
+      (concat (match-string 1 result) "000M")
+      )
+     (t result)
+     )
+    ))
+
+
 (defun transmission-size (bytes)
   "Return string showing size BYTES in human-readable form."
-  (file-size-human-readable bytes transmission-units))
+  (file-size-human-readable-jpi bytes transmission-units))
 
 (defun transmission-percent (have total)
   "Return the percentage of HAVE by TOTAL."
