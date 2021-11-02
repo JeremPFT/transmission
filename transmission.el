@@ -1301,12 +1301,35 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
      "torrent-get" (list :ids ids :fields ["status"])))
   (revert-buffer))
 
+(defun process-labels (labels)
+  (let (result)
+    (cl-loop for label in labels do
+             ;; replace '.' with '_'
+             (setq label (downcase (replace-regexp-in-string "\\." "_" label)))
+             ;; split label with ":"
+             (let (expand)
+               (cl-loop for sublabel in (split-string label ":" t) do
+                        (push sublabel expand))
+               (setq expand (nreverse expand))
+               (setq result (append result expand)))
+             )
+
+    ;; (if (= 1 (length labels))
+
+    ;;     (split-string (car labels) ":" t)
+    ;;   labels
+
+    result
+    )
+  )
+
 (defun transmission-label (ids labels)
   "Set labels for selected torrent(s)."
   (transmission-interactive
    (let* ((response (transmission-request "torrent-get" '(:fields ["labels"])))
           (torrents (transmission-torrents response)))
      (list ids (transmission-read-strings "Labels: " (transmission-unique-labels torrents)))))
+  (setq labels (process-labels labels))
   (transmission-request-async
    nil "torrent-set" (list :ids ids :labels (vconcat labels)))
   (revert-buffer))
@@ -1989,15 +2012,28 @@ Each form in BODY is a column descriptor."
     (format "%d" (transmission-rate .rateDownload))
     (format "%d" (transmission-rate .rateUpload))
     (format "%.1f" (if (> .uploadRatio 0) .uploadRatio 0))
+
     (if (not (zerop .error)) (propertize "error" 'font-lock-face 'error)
       (transmission-format-status .status .rateUpload .rateDownload))
+
+    ;; name & labeles
     (concat
+
+     ;; name
      (if (eq nil .downloadDir) (propertize .name 'transmission-name t)
        (propertize (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) 'transmission-name t))
 
-     (mapconcat (lambda (l)
-                  (concat " " (propertize (concat ":" l ":") 'font-lock-face 'font-lock-constant-face)))
-                .labels "")))
+     ;; labels
+     (propertize
+      (concat (if (zerop (length .labels)) "" " :")
+              (mapconcat (lambda (l)
+                           (concat l ":"))
+                         .labels ""))
+      'font-lock-face 'font-lock-constant-face)
+
+     ) ;; concat name & labels
+
+    ) ;; transmission-do-entries
   (tabulated-list-print))
 
 (defun torrent-file-name (torrent-file)
