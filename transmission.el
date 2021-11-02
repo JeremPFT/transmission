@@ -1971,8 +1971,7 @@ Each form in BODY is a column descriptor."
   (let* ((arguments `(:fields ,transmission-draw-torrents-keys))
          (response (transmission-request "torrent-get" arguments)))
     (setq transmission-torrent-vector
-          (vconcat (transmission-draw-torrents-filtering (transmission-torrents response))
-                   (list)))
+          (vconcat (transmission-draw-torrents-filtering (transmission-torrents response))))
     )
   (transmission-do-entries transmission-torrent-vector
     (number-to-string .id)
@@ -2025,7 +2024,7 @@ Each form in BODY is a column descriptor."
                        (append files-filtered-list (list file)))
 
                  ))
-      (setq files (vconcat files-filtered-list nil)))
+      (setq files (vconcat files-filtered-list)))
 
     (transmission-do-entries files
       (format "%d%%" (transmission-percent .bytesCompleted .length))
