@@ -1954,8 +1954,6 @@ Each form in BODY is a column descriptor."
 (defun torrent-has-infinite-eta (torrent)
   (and (<= (torrent-eta torrent) 0) (not (= (torrent-percentDone torrent) 1))))
 
-;; torrent age: rpc, field addedDate
-
 (defun transmission-draw-torrents-filtering (torrent-array)
   (let ((filtered-list nil))
     (cl-loop for torrent across torrent-array do
@@ -1989,6 +1987,10 @@ Each form in BODY is a column descriptor."
                ))
     filtered-list
     ))
+
+;; torrent age: rpc, field addedDate
+;; (float-time (time-subtract (time-add (current-time) 3600) (current-time)))
+;; float-time: convert result from time to seconds
 
 (defun transmission-draw-torrents (_id)
   (let* ((arguments `(:fields ,transmission-draw-torrents-keys))
