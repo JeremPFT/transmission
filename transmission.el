@@ -1963,7 +1963,7 @@ Each form in BODY is a column descriptor."
 
                   (torrent-is-done torrent)
 
-                  (torrent-has-no-label torrent)
+                  ;; (torrent-has-no-label torrent)
 
                   ;; (string-match ".*larimar.*" (torrent-name torrent))
 
@@ -1977,8 +1977,9 @@ Each form in BODY is a column descriptor."
                   ;;  (torrent-has-infinite-eta torrent))
 
                   ;; (member "convert_todo" (torrent-labels torrent))
-                  (not (member "film" (torrent-labels torrent)))
-                  (not (member "linux" (torrent-labels torrent)))
+                  ;; (member "name__lily_larimar" (torrent-labels torrent))
+                  ;; (not (member "linux" (torrent-labels torrent)))
+                  ;; (not (member "convert_done" (torrent-labels torrent)))
                   )
 
                (setq filtered-list (nconc filtered-list (list torrent)))
