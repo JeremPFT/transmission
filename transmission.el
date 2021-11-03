@@ -2052,7 +2052,9 @@ Each form in BODY is a column descriptor."
       (cl-loop for file across files do
                (when
                    (and
+                    t
                     (not (zerop (cdr (assoc 'wanted file))))
+
                     ;; (string-match
                     ;;  "\\(\\(mp4\\)\\|\\(avi\\)\\|\\(wmv\\)\\|\\(mov\\)\\)$"
                     ;;  (torrent-file-name file))
