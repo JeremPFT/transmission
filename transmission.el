@@ -270,6 +270,7 @@ caching built in or is otherwise slow."
 
 (defconst transmission-draw-torrents-keys
   ["id" "hashString" "name" "status" "eta" "error" "labels"
+   "addedDate"
    "rateDownload" "rateUpload"
    "downloadDir"
    "percentDone" "sizeWhenDone" "metadataPercentComplete"
@@ -1989,9 +1990,16 @@ Each form in BODY is a column descriptor."
     filtered-list
     ))
 
-;; torrent age: rpc, field addedDate
-;; (float-time (time-subtract (time-add (current-time) 3600) (current-time)))
-;; float-time: convert result from time to seconds
+(defun transmission-age-jpi (addedDate-as-seconds)
+  "convert torrent added date from transmission value (seconds
+since epoch) to emacs lisp format"
+  (let ((now-as-seconds (time-convert nil 'integer))
+        age)
+    (setq age (- now-as-seconds addedDate-as-seconds))
+    (if (>= age (* 24 3600))
+        (format-seconds "%.2dd%.2hh" (- now-as-seconds addedDate-as-seconds))
+      (format-seconds "%.2hh%.2mm" (- now-as-seconds addedDate-as-seconds))
+      )))
 
 (defun transmission-draw-torrents (_id)
   (let* ((arguments `(:fields ,transmission-draw-torrents-keys))
@@ -2012,20 +2020,30 @@ Each form in BODY is a column descriptor."
 
     (format "%d%%" (* 100 (if (= 1 .metadataPercentComplete)
                               .percentDone .metadataPercentComplete)))
-    (format "%d" (transmission-rate .rateDownload))
-    (format "%d" (transmission-rate .rateUpload))
-    (format "%.1f" (if (> .uploadRatio 0) .uploadRatio 0))
+
+    ;; (format "%d" (transmission-rate .rateDownload))
+    ;; (format "%d" (transmission-rate .rateUpload))
+    ;; (format "%.1f" (if (> .uploadRatio 0) .uploadRatio 0))
 
     (if (not (zerop .error)) (propertize "error" 'font-lock-face 'error)
       (transmission-format-status .status .rateUpload .rateDownload))
 
+    ;; age
+    (transmission-age-jpi .addedDate)
+
     ;; name & labeles
     (concat
 
-     ;; name
-     (if (eq nil .downloadDir) (propertize .name 'transmission-name t)
-       (propertize (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) 'transmission-name t))
 
+     ;; name
+     (if (eq nil .downloadDir)
+         (propertize .name 'transmission-name t)
+       (let ((print-directory nil))
+         (if print-directory
+             (propertize (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) 'transmission-name t)
+           (propertize .name 'transmission-name t)
+           )
+         ))
      ;; labels
      (propertize
       (concat (if (zerop (length .labels)) "" " :")
@@ -2234,6 +2252,8 @@ is constructed from TEST, BODY and the `tabulated-list-id' tagged as `<>'."
 (define-transmission-predicate ratio>? > (cdr (assq 'uploadRatio <>)))
 (define-transmission-predicate progress>? > (cdr (assq 'progress <>)))
 (define-transmission-predicate file-want? > (cdr (assq 'wanted <>)))
+(define-transmission-predicate age>? > (cdr (assq 'addedDate <>)))
+
 
 (define-transmission-predicate eta>=? >=
   (let-alist <>
@@ -2533,11 +2553,12 @@ Transmission."
          ("Size" 9 transmission-size-when-done>?
           :right-align t :transmission-size t)
          ("Have" 4 transmission-percent-done>? :right-align t)
-         ("Down" 4 nil :right-align t)
-         ("Up" 3 nil :right-align t)
-         ("Ratio" 5 transmission-ratio>? :right-align t)
-         ("Status" 11 t)
-         ("Name (8)" 0 t)])
+         ;; ("Down" 4 nil :right-align t)
+         ;; ("Up" 3 nil :right-align t)
+         ;; ("Ratio" 5 transmission-ratio>? :right-align t)
+         ("Status" 7 t)
+         ("[5] Age" 7 transmission-age>? :right-align t)
+         ("Name" 0 t)])
   (setq tabulated-list-padding 1)
   (transmission-tabulated-list-format)
   (setq tabulated-list-printer #'transmission-print-torrent)
