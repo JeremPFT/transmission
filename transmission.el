@@ -2059,11 +2059,10 @@ since epoch) to emacs lisp format"
     ;; name & labeles
     (concat
 
-
      ;; name
      (if (eq nil .downloadDir)
          (propertize .name 'transmission-name t)
-       (let ((print-directory nil))
+       (let ((print-directory t))
          (if print-directory
              (propertize (concat (abbreviate-file-name (file-name-as-directory .downloadDir)) .name) 'transmission-name t)
            (propertize .name 'transmission-name t)
@@ -2278,7 +2277,6 @@ is constructed from TEST, BODY and the `tabulated-list-id' tagged as `<>'."
 (define-transmission-predicate progress>? > (cdr (assq 'progress <>)))
 (define-transmission-predicate file-want? > (cdr (assq 'wanted <>)))
 (define-transmission-predicate age>? > (cdr (assq 'addedDate <>)))
-
 
 (define-transmission-predicate eta>=? >=
   (let-alist <>
