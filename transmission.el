@@ -1169,7 +1169,7 @@ When called with a prefix, prompt for DIRECTORY."
   (when ids
     (let ((arguments (list :ids ids :move t :location
                            (if (eq system-type 'windows-nt)
-                               (replace-regexp-in-string "/" "\\\\" location)
+                               (replace-regexp-in-string "/" "\\\\" (directory-file-name location))
                              location))))
       (transmission-request-async nil "torrent-set-location" arguments))))
 
