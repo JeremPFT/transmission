@@ -1165,15 +1165,22 @@ When called with a prefix, prompt for DIRECTORY."
                 (transmission-eta .current-stats.secondsActive nil))))
    "session-stats"))
 
+(defun transmission-move-internal-jpi (ids location)
+  (when ids
+    (let ((arguments (list :ids ids :move t :location
+                           (if (eq system-type 'windows-nt)
+                               (replace-regexp-in-string "/" "\\\\" location)
+                             location))))
+      (transmission-request-async nil "torrent-set-location" arguments))))
+
 (defun transmission-move (ids location)
   "Move torrent at point, marked, or in region to a new LOCATION."
   (transmission-interactive
    (let* ((dir (read-directory-name "New directory: "))
           (prompt (format "Move torrent%s to %s? " (if (cdr ids) "s" "") dir)))
      (if (y-or-n-p prompt) (list ids dir) '(nil nil))))
-  (when ids
-    (let ((arguments (list :ids ids :move t :location (expand-file-name location))))
-      (transmission-request-async nil "torrent-set-location" arguments))))
+  (transmission-move-internal-jpi ids location)
+  )
 
 (defun transmission-reannounce (ids)
   "Reannounce torrent at point, marked, or in region."
