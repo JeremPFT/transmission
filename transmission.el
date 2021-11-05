@@ -1964,21 +1964,26 @@ Each form in BODY is a column descriptor."
 (defun torrent-has-infinite-eta (torrent)
   (and (<= (torrent-eta torrent) 0) (not (= (torrent-percentDone torrent) 1))))
 
-(defun transmission-draw-torrents-filtering (torrent-array)
+(defun transmission-draw-torrents-filtering-jpi (torrent-array)
   (let ((filtered-list nil))
     (cl-loop for torrent across torrent-array do
              (when
                  (and
                   t
 
-                  (torrent-is-done torrent)
+                  ;; (or
+                  ;;  t
+                  ;;  (= (cdr (assoc 'id torrent)) 216)
+                  ;;  (= (cdr (assoc 'id torrent)) 87))
+
+                  ;; (torrent-is-done torrent)
 
                   ;; (torrent-has-no-label torrent)
 
-                  ;; (string-match ".*larimar.*" (torrent-name torrent))
+                  ;; (string-match ".*vina.*" (torrent-name torrent))
+                  ;; (string-match ".*sky.*" (torrent-name torrent))
 
                   ;; (> (torrent-sizeWhenDone torrent) (expt 10 9)) ;; size > 1G
-
 
                   ;; (torrent-has-infinite-eta torrent)
 
@@ -1988,8 +1993,19 @@ Each form in BODY is a column descriptor."
 
                   ;; (member "convert_todo" (torrent-labels torrent))
                   ;; (member "name__lily_larimar" (torrent-labels torrent))
-                  ;; (not (member "linux" (torrent-labels torrent)))
+
+                  (not (member "linux" (torrent-labels torrent)))
+                  (not (member "film" (torrent-labels torrent)))
+
+                  ;; (or (member "linux" (torrent-labels torrent))
+                  ;;     (member "film" (torrent-labels torrent)))
+
+                  ;; (not (member "note_4" (torrent-labels torrent)))
+                  ;; (not (member "note_5" (torrent-labels torrent)))
+                  ;; (not (member "note_3" (torrent-labels torrent)))
+
                   ;; (not (member "convert_done" (torrent-labels torrent)))
+                  ;; (not (member "convert_todo" (torrent-labels torrent)))
                   )
 
                (setq filtered-list (nconc filtered-list (list torrent)))
@@ -2014,7 +2030,7 @@ since epoch) to emacs lisp format"
   (let* ((arguments `(:fields ,transmission-draw-torrents-keys))
          (response (transmission-request "torrent-get" arguments)))
     (setq transmission-torrent-vector
-          (vconcat (transmission-draw-torrents-filtering (transmission-torrents response))))
+          (vconcat (transmission-draw-torrents-filtering-jpi (transmission-torrents response))))
     )
   (transmission-do-entries transmission-torrent-vector
     (number-to-string .id)
