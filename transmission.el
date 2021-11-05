@@ -587,16 +587,18 @@ METHOD, ARGUMENTS, and TAG are the same as in `transmission-request'."
 
   (let ((result (file-size-human-readable bytes units)))
     (cond
-     ((string-match "\\([1-9]+\\)\\.\\([1-9]\\)G$" result)
-      (concat (match-string 1 result) (match-string 2 result) "00M")
+     ((string-match "^\\([0-9]+\\)\\.\\([0-9]\\)G$" result)
+      (concat (match-string 1 result) (match-string 2 result) "00.0M")
       )
-     ((string-match "\\([1-9]+\\)G$" result)
-      (concat (match-string 1 result) "000M")
+     ((string-match "^\\([0-9]+\\)G$" result)
+      (concat (match-string 1 result) "000.0M")
+      )
+     ((string-match "^\\([0-9]+\\)M$" result)
+      (concat (match-string 1 result) ".0M")
       )
      (t result)
      )
     ))
-
 
 (defun transmission-size (bytes)
   "Return string showing size BYTES in human-readable form."
