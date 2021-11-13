@@ -1312,14 +1312,14 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
      "torrent-get" (list :ids ids :fields ["status"])))
   (revert-buffer))
 
-(defun process-labels (labels)
+(defun transmission-process-labels-jpi (labels)
   (let (result)
     (cl-loop for label in labels do
              ;; replace '.' with '_'
              (setq label (downcase (replace-regexp-in-string "\\." "_" label)))
              ;; split label with ":"
              (let (expand)
-               (cl-loop for sublabel in (split-string label ":" t) do
+               (cl-loop for sublabel in (split-string (string-trim label) ":" t) do
                         (push sublabel expand))
                (setq expand (nreverse expand))
                (setq result (append result expand)))
@@ -1340,7 +1340,7 @@ When called with a prefix UNLINK, also unlink torrent data on disk."
    (let* ((response (transmission-request "torrent-get" '(:fields ["labels"])))
           (torrents (transmission-torrents response)))
      (list ids (transmission-read-strings "Labels: " (transmission-unique-labels torrents)))))
-  (setq labels (process-labels labels))
+  (setq labels (transmission-process-labels-jpi labels))
   (transmission-request-async
    nil "torrent-set" (list :ids ids :labels (vconcat labels)))
   (revert-buffer))
