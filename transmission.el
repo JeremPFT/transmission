@@ -1946,6 +1946,9 @@ Each form in BODY is a column descriptor."
 (defun torrent-name (torrent)
   (cdr (assoc 'name torrent)))
 
+(defun torrent-dir (torrent)
+  (cdr (assoc 'downloadDir torrent)))
+
 (defun torrent-percentDone (torrent)
   (cdr (assoc 'percentDone torrent)))
 
@@ -1983,6 +1986,8 @@ Each form in BODY is a column descriptor."
 
                   ;; (string-match ".*vina.*" (torrent-name torrent))
                   ;; (string-match ".*sky.*" (torrent-name torrent))
+
+                  ;; (string-match "^c:.*" (torrent-dir torrent))
 
                   ;; (> (torrent-sizeWhenDone torrent) (expt 10 9)) ;; size > 1G
 
