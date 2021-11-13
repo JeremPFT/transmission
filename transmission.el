@@ -287,7 +287,8 @@ caching built in or is otherwise slow."
    "downloadedEver" "corruptEver" "haveValid" "totalSize" "percentDone"
    "seedRatioLimit" "seedRatioMode" "bandwidthPriority" "downloadDir"
    "uploadLimit" "uploadLimited" "downloadLimit" "downloadLimited"
-   "honorsSessionLimits" "rateDownload" "rateUpload" "queuePosition"])
+   "honorsSessionLimits" "rateDownload" "rateUpload" "queuePosition"
+   "comment"])
 
 (defconst transmission-file-symbols
   '(:files-wanted :files-unwanted :priority-high :priority-low :priority-normal)
@@ -2167,7 +2168,8 @@ since epoch) to emacs lisp format"
       (unless (zerop .corruptEver)
         (concat "Corrupt: " (transmission-format-size .corruptEver)))
       (concat "Total size: " (transmission-format-size .totalSize))
-      (transmission-format-pieces-internal .pieces .pieceCount .pieceSize))))
+      (transmission-format-pieces-internal .pieces .pieceCount .pieceSize)
+      (concat "\nComment: " .comment))))
 
 (defun transmission-draw-peers (id)
   (let* ((arguments `(:ids ,id :fields ["peers"]))
