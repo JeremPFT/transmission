@@ -1997,18 +1997,20 @@ Each form in BODY is a column descriptor."
                   ;;  (torrent-is-not-done torrent)
                   ;;  (torrent-has-infinite-eta torrent))
 
-                  ;; (member "convert_todo" (torrent-labels torrent))
+                  ;; (member "fh" (torrent-labels torrent))
+
                   ;; (member "name__lily_larimar" (torrent-labels torrent))
 
+                  (member "film" (torrent-labels torrent))
                   (not (member "linux" (torrent-labels torrent)))
-                  (not (member "film" (torrent-labels torrent)))
+                  (not (member "game" (torrent-labels torrent)))
 
                   ;; (or (member "linux" (torrent-labels torrent))
                   ;;     (member "film" (torrent-labels torrent)))
 
-                  ;; (not (member "note_4" (torrent-labels torrent)))
-                  ;; (not (member "note_5" (torrent-labels torrent)))
-                  ;; (not (member "note_3" (torrent-labels torrent)))
+                  ;; (or (member "note_4" (torrent-labels torrent))
+                  ;;     (member "note_5" (torrent-labels torrent))
+                  ;;     (member "note_3" (torrent-labels torrent)))
 
                   ;; (not (member "convert_done" (torrent-labels torrent)))
                   ;; (not (member "convert_todo" (torrent-labels torrent)))
